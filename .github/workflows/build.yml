@@ -1,0 +1,52 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore
+        run: dotnet restore Jellyfin.Plugin.EpisodeContinuity.sln
+      - name: Build
+        run: dotnet build Jellyfin.Plugin.EpisodeContinuity.sln -c Release --no-restore
+      - name: Test
+        run: dotnet test Jellyfin.Plugin.EpisodeContinuity.sln -c Release --no-build --logger "trx"
+      - name: Package
+        run: bash scripts/package.sh Release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plugin
+          path: |
+            artifacts/*.zip
+            artifacts/manifest.json
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/*.zip
+            artifacts/manifest.json
+      - name: Publish manifest to main
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          cp artifacts/manifest.json /tmp/manifest.json
+          git fetch origin main
+          git checkout main
+          cp /tmp/manifest.json manifest.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "Publish plugin manifest for ${GITHUB_REF_NAME}" || echo "manifest unchanged"
+          git push origin main

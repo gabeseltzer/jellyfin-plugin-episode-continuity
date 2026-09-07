@@ -1,0 +1,49 @@
+# Disk sharing with the sibling jellyfin-data-flow-plugin devcontainer:
+#   - Dockerfile is byte-identical, so the base image and apt layer come from Docker's build cache.
+#   - devcontainer-lock.json pins the same feature versions, so the feature layers are cached too.
+#   - jellyfin/jellyfin:10.11 is the same image tag.
+#   - NuGet packages live in one named volume (jellyfin-plugin-nuget) shared by both repos.
+# Only this repo's Jellyfin config/cache and the workspace itself are separate.
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspaces/jellyfin-plugin-episode-continuity:cached
+      - jellyfin-plugin-nuget:/home/vscode/.nuget/packages
+      # Share the host's Claude Code login, settings, and memory with the container.
+      # Both paths must exist on the host (they do once you've run `claude` once).
+      # CLAUDE_HOST_HOME overrides where they live. Needed when VS Code runs Dev
+      # Containers inside WSL (dev.containers.executeInWSL): there `~` is the WSL
+      # home, not your Windows profile, and Docker silently creates empty root-owned
+      # placeholders that Claude cannot write to. Set it in .devcontainer/.env
+      # (gitignored), e.g. CLAUDE_HOST_HOME=/mnt/c/Users/<you>
+      - ${CLAUDE_HOST_HOME:-~}/.claude:/home/vscode/.claude
+      - ${CLAUDE_HOST_HOME:-~}/.claude.json:/home/vscode/.claude.json
+    working_dir: /workspaces/jellyfin-plugin-episode-continuity
+    command: sleep infinity
+    environment:
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      DOTNET_NOLOGO: "1"
+      JELLYFIN_URL: http://jellyfin:8096
+      JELLYFIN_CONTAINER: jellyfin-episodecontinuity-dev
+
+  jellyfin:
+    image: jellyfin/jellyfin:10.11
+    container_name: jellyfin-episodecontinuity-dev
+    # Host port 8097 so this can run alongside the data-flow dev Jellyfin on 8096.
+    ports:
+      - "8097:8096"
+    volumes:
+      - ../.dev/jellyfin/config:/config
+      - ../.dev/jellyfin/cache:/cache
+      - ../dist/plugins:/config/plugins
+      - ../media:/media:ro
+    environment:
+      JELLYFIN_PublishedServerUrl: http://localhost:8097
+    restart: unless-stopped
+
+volumes:
+  jellyfin-plugin-nuget:
+    name: jellyfin-plugin-nuget

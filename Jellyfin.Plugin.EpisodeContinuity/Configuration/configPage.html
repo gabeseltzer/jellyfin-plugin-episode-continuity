@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Episode Continuity</title>
+</head>
+<body>
+  <div id="EpisodeContinuityConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
+    <div data-role="content">
+      <div class="content-primary">
+        <form id="EpisodeContinuityConfigForm">
+          <div class="sectionTitleContainer flex align-items-center">
+            <h2 class="sectionTitle">Episode Continuity</h2>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="Enabled" name="Enabled" type="checkbox" is="emby-checkbox" />
+              <span>Enabled</span>
+            </label>
+            <div class="fieldDescription checkboxFieldDescription">Turn the plugin off without uninstalling it.</div>
+          </div>
+
+          <div>
+            <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+              <span>Save</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      (function () {
+        var pluginId = '3f8a1c6e-9d2b-4a7f-b5e4-c1d0e8f7a2b9';
+        var page = document.querySelector('#EpisodeContinuityConfigPage');
+
+        page.addEventListener('pageshow', function () {
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+            page.querySelector('#Enabled').checked = config.Enabled !== false;
+            Dashboard.hideLoadingMsg();
+          }, function () {
+            Dashboard.hideLoadingMsg();
+          });
+        });
+
+        page.querySelector('#EpisodeContinuityConfigForm').addEventListener('submit', function (e) {
+          e.preventDefault();
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+            config.Enabled = page.querySelector('#Enabled').checked;
+            return ApiClient.updatePluginConfiguration(pluginId, config);
+          }).then(function (result) {
+            Dashboard.processPluginConfigurationUpdateResult(result);
+          }, function () {
+            Dashboard.hideLoadingMsg();
+            Dashboard.alert('Failed to save Episode Continuity settings.');
+          });
+          return false;
+        });
+      })();
+    </script>
+  </div>
+</body>
+</html>

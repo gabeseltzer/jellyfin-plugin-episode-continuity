@@ -1,0 +1,32 @@
+{
+  "name": "Jellyfin Episode Continuity plugin",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspaces/jellyfin-plugin-episode-continuity",
+  "shutdownAction": "stopCompose",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/node:1": { "version": "lts" },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+  },
+  "forwardPorts": [8097],
+  "portsAttributes": {
+    "8097": { "label": "Jellyfin", "onAutoForward": "notify" }
+  },
+  "postCreateCommand": "bash scripts/post-create.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
+        "editorconfig.editorconfig"
+      ],
+      "settings": {
+        "dotnet.defaultSolution": "Jellyfin.Plugin.EpisodeContinuity.sln",
+        "files.eol": "\n"
+      }
+    }
+  },
+  "remoteUser": "vscode"
+}

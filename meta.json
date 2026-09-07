@@ -1,0 +1,12 @@
+{
+  "category": "General",
+  "changelog": "Initial release.",
+  "description": "TODO",
+  "guid": "3f8a1c6e-9d2b-4a7f-b5e4-c1d0e8f7a2b9",
+  "name": "Episode Continuity",
+  "overview": "TODO",
+  "owner": "Gabriel Seltzer",
+  "targetAbi": "10.11.0.0",
+  "timestamp": "2026-09-07T00:00:00Z",
+  "version": "__VERSION__"
+}

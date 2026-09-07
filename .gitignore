@@ -1,0 +1,17 @@
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+artifacts/
+*.zip
+TestResults/
+node_modules/
+.dev/
+dist/
+media/*
+!media/.gitkeep
+
+# Per-machine Dev Container overrides (see docker-compose.yml)
+.devcontainer/.env
