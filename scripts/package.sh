@@ -8,6 +8,8 @@ PROJECT=Jellyfin.Plugin.EpisodeContinuity
 VERSION=$(grep -oP '(?<=<AssemblyVersion>)[^<]+' "$PROJECT/$PROJECT.csproj")
 ABI=$(grep -oP '(?<=targetAbi: ")[^"]+' build.yaml)
 REPO_URL=${REPO_URL:-https://github.com/gabeseltzer/jellyfin-plugin-episode-continuity}
+DESCRIPTION="Detects gaps in a series (episodes the metadata provider knows about but that have no file) and warns at playback time: a warning inside the web client's 'Next episode' countdown, a pause-and-confirm interstitial before an episode that skips missing ones, and a server-sent toast for other clients."
+OVERVIEW='Warns viewers when the next episode to play is not the next one in the series because episodes in between are missing from the library.'
 OUT=artifacts; ZIP="episodecontinuity_${VERSION}.zip"
 DLL="$PROJECT/bin/$CONFIG/net9.0/$PROJECT.dll"
 [ -f "$DLL" ] || dotnet build "$PROJECT/$PROJECT.csproj" -c "$CONFIG" --nologo -v quiet
@@ -20,12 +22,13 @@ rm -rf "$OUT/stage"
 CHECKSUM=$(md5sum "$OUT/$ZIP" | cut -d' ' -f1)
 TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 jq -n --arg v "$VERSION" --arg abi "$ABI" --arg sum "$CHECKSUM" --arg ts "$TIMESTAMP" \
+  --arg desc "$DESCRIPTION" --arg over "$OVERVIEW" \
   --arg url "$REPO_URL/releases/download/v${VERSION%.0}/$ZIP" '
 [{
   guid: "3f8a1c6e-9d2b-4a7f-b5e4-c1d0e8f7a2b9",
   name: "Episode Continuity",
-  description: "TODO",
-  overview: "TODO",
+  description: $desc,
+  overview: $over,
   owner: "gabeseltzer",
   category: "General",
   imageUrl: "",

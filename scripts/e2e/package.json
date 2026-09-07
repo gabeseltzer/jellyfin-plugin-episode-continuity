@@ -1,0 +1,12 @@
+{
+  "name": "episode-continuity-e2e",
+  "private": true,
+  "description": "Browser end-to-end check of the injected web script against the devcontainer Jellyfin.",
+  "scripts": {
+    "setup": "npx playwright install chrome",
+    "test": "node e2e.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}
