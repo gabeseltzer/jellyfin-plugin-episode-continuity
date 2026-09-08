@@ -9,6 +9,14 @@
     "imageUrl": "",
     "versions": [
       {
+        "version": "0.1.2.0",
+        "changelog": "- README documents that missing episodes come only from the TVDB plugin's \"Missing Episode Fetcher\", with a Requirements block and a Troubleshooting check.\n- Logs a startup warning when the library has no virtual episodes and the numbering-gaps option is off, since no gap can be detected in that state.\n- Describes the limits of the numbering-gaps fallback (same-season holes between two known episodes only).",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/gabeseltzer/jellyfin-plugin-episode-continuity/releases/download/v0.1.2/episodecontinuity_0.1.2.0.zip",
+        "checksum": "a63510b68e5a478e479f58fc7e9bdf56",
+        "timestamp": "2026-09-08T05:01:37Z"
+      },
+      {
         "version": "0.1.1.0",
         "changelog": "- \"Also treat gaps in episode numbers as missing episodes\" is now a regular option on the settings page.\n- Configurable cooldown between repeat warnings for the same session and episode (default 60 s).\n- Settings page explains how the server warning and the web interstitial relate.\n- Fixed invalid quoting in the plugin metadata.",
         "targetAbi": "10.11.0.0",
