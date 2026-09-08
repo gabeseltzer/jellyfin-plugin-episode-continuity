@@ -23,6 +23,15 @@ jobs:
         run: dotnet build Jellyfin.Plugin.EpisodeContinuity.sln -c Release --no-restore
       - name: Test
         run: dotnet test Jellyfin.Plugin.EpisodeContinuity.sln -c Release --no-build --logger "trx"
+      - name: Check tag matches the project version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          VERSION=$(grep -oP '(?<=<AssemblyVersion>)[^<]+' Jellyfin.Plugin.EpisodeContinuity/Jellyfin.Plugin.EpisodeContinuity.csproj)
+          EXPECTED="v${VERSION%.0}"
+          if [ "$GITHUB_REF_NAME" != "$EXPECTED" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match AssemblyVersion $VERSION (expected $EXPECTED)"; exit 1
+          fi
+          grep -q "version: \"$VERSION\"" build.yaml || { echo "build.yaml version does not match $VERSION"; exit 1; }
       - name: Package
         run: bash scripts/package.sh Release
       - uses: actions/upload-artifact@v4

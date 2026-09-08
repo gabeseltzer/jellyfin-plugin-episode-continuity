@@ -21,19 +21,23 @@ sed "s/__VERSION__/$VERSION/g" meta.json > "$OUT/stage/meta.json"
 rm -rf "$OUT/stage"
 CHECKSUM=$(md5sum "$OUT/$ZIP" | cut -d' ' -f1)
 TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-jq -n --arg v "$VERSION" --arg abi "$ABI" --arg sum "$CHECKSUM" --arg ts "$TIMESTAMP" \
-  --arg desc "$DESCRIPTION" --arg over "$OVERVIEW" \
+CHANGELOG=$(awk '/^changelog: \|/{f=1;next} f&&/^[^ ]/{f=0} f{sub(/^  /,"");print}' build.yaml)
+# Start from the manifest already published on main (if any) so older versions stay installable.
+EXISTING=$(cat manifest.json 2>/dev/null || echo '[]')
+jq --arg v "$VERSION" --arg abi "$ABI" --arg sum "$CHECKSUM" --arg ts "$TIMESTAMP" \
+  --arg desc "$DESCRIPTION" --arg over "$OVERVIEW" --arg log "$CHANGELOG" \
   --arg url "$REPO_URL/releases/download/v${VERSION%.0}/$ZIP" '
-[{
-  guid: "3f8a1c6e-9d2b-4a7f-b5e4-c1d0e8f7a2b9",
-  name: "Episode Continuity",
-  description: $desc,
-  overview: $over,
-  owner: "gabeseltzer",
-  category: "General",
-  imageUrl: "",
-  versions: [{
-    version: $v, changelog: "Initial release.", targetAbi: $abi, sourceUrl: $url, checksum: $sum, timestamp: $ts
-  }]
-}]' > "$OUT/manifest.json"
+  (if type == "array" and length > 0 then .[0].versions else [] end) as $old
+  | [{
+    guid: "3f8a1c6e-9d2b-4a7f-b5e4-c1d0e8f7a2b9",
+    name: "Episode Continuity",
+    description: $desc,
+    overview: $over,
+    owner: "gabeseltzer",
+    category: "General",
+    imageUrl: "",
+    versions: ([{
+      version: $v, changelog: $log, targetAbi: $abi, sourceUrl: $url, checksum: $sum, timestamp: $ts
+    }] + [$old[] | select(.version != $v)])
+  }]' <<<"$EXISTING" > "$OUT/manifest.json"
 echo "Packaged $OUT/$ZIP ($CHECKSUM)"; ls -la "$OUT"
