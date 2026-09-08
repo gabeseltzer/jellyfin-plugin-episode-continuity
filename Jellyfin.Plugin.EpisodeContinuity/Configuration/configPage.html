@@ -35,7 +35,7 @@
               <option value="Modal">Dialog with OK button</option>
               <option value="PauseAndModal">Pause, dialog, then resume</option>
             </select>
-            <div class="fieldDescription">Sent by the server to the client that started playback. Works on the web client and other clients that support display messages. Skipped for web sessions where the plugin's own script is active.</div>
+            <div class="fieldDescription">Sent by the server to the client that started playback. Works on the web client and other clients that support display messages. <strong>Not shown in the web client while the interstitial below is enabled</strong>, since the interstitial replaces it there; turn the interstitial off to see this in a browser.</div>
           </div>
 
           <div class="inputContainer">
@@ -61,7 +61,7 @@
               <input id="UpNextWarningEnabled" name="UpNextWarningEnabled" type="checkbox" is="emby-checkbox" />
               <span>Warn in the "Next episode" countdown</span>
             </label>
-            <div class="fieldDescription checkboxFieldDescription">When the episode queued to autoplay is not the next one, the countdown dialog says which episodes are missing.</div>
+            <div class="fieldDescription checkboxFieldDescription">When the episode queued to autoplay is not the next one, the countdown dialog says which episodes are missing. Jellyfin only shows that countdown for episodes of 10 minutes or longer, about 30 seconds before the end.</div>
           </div>
 
           <div class="checkboxContainer checkboxContainer-withDescription">

@@ -14,6 +14,8 @@
     var LOG = '[EpisodeContinuity]';
     var HELLO_INTERVAL_MS = 10 * 60 * 1000;
     var config = null;
+    var configLoadedAt = 0;
+    var CONFIG_TTL_MS = 15 * 1000;
     var currentItemId = null;
     var continuityCache = {}; // normalized item id -> Promise<result>
     var lastHello = 0;
@@ -69,6 +71,7 @@
             return Promise.resolve(null);
         }
         return getJSON('EpisodeContinuity/ClientConfig').then(function (c) {
+            configLoadedAt = Date.now();
             config = {
                 enabled: !!prop(c, 'Enabled'),
                 upNext: !!prop(c, 'UpNextWarningEnabled'),
@@ -83,11 +86,11 @@
         });
     }
 
-    function ensureConfig() {
-        if (config) {
+    function ensureConfig(fresh) {
+        if (config && !(fresh && Date.now() - configLoadedAt > CONFIG_TTL_MS)) {
             return Promise.resolve(config);
         }
-        return loadConfig();
+        return loadConfig().then(function (c) { return c || config; });
     }
 
     function sayHello() {
@@ -175,10 +178,12 @@
         }
         log('playback info for', id);
         currentItemId = id;
-        sayHello();
-        ensureConfig().then(function (cfg) {
+        ensureConfig(true).then(function (cfg) {
             if (!cfg || !cfg.enabled) {
                 return;
+            }
+            if (cfg.interstitial) {
+                sayHello();
             }
             getContinuity(id).then(function (result) {
                 if (!result || currentItemId !== id) {
@@ -459,7 +464,7 @@
             attempts += 1;
             if (loggedIn()) {
                 clearInterval(poll);
-                loadConfig().then(function () { sayHello(); });
+                loadConfig();
             } else if (attempts > 600) {
                 clearInterval(poll);
             }

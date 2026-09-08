@@ -71,15 +71,20 @@ public sealed class PlaybackWarningService : IHostedService
     /// Decides whether a playback start should produce a warning, without side effects.
     /// </summary>
     /// <param name="config">The current configuration.</param>
+    /// <param name="webClients">The registry of devices running the web script.</param>
     /// <param name="deviceId">The device that started playback.</param>
     /// <param name="isEpisode">Whether the item is an episode.</param>
     /// <returns>True when the server should look at continuity for this start.</returns>
-    public bool ShouldConsider(PluginConfiguration config, string? deviceId, bool isEpisode)
+    public static bool ShouldConsider(PluginConfiguration config, WebClientRegistry webClients, string? deviceId, bool isEpisode)
     {
-        return config.Enabled
-            && config.ServerPushMode != ServerPushMode.Off
-            && isEpisode
-            && !_webClients.IsActive(deviceId);
+        if (!config.Enabled || config.ServerPushMode == ServerPushMode.Off || !isEpisode)
+        {
+            return false;
+        }
+
+        // The web script only replaces the server warning while it is allowed to show its interstitial.
+        var webHandlesIt = config.WebFeaturesEnabled && config.InterstitialEnabled && webClients.IsActive(deviceId);
+        return !webHandlesIt;
     }
 
     private void OnPlaybackStart(object? sender, PlaybackProgressEventArgs e)
@@ -98,7 +103,7 @@ public sealed class PlaybackWarningService : IHostedService
             }
 
             var config = Plugin.CurrentConfiguration;
-            if (!ShouldConsider(config, session.DeviceId, e.Item is Episode))
+            if (!ShouldConsider(config, _webClients, session.DeviceId, e.Item is Episode))
             {
                 return;
             }
