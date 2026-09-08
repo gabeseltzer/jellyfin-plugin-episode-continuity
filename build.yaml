@@ -1,7 +1,7 @@
 # jprm (Jellyfin Plugin Repository Manager) build manifest
 name: "Episode Continuity"
 guid: "3f8a1c6e-9d2b-4a7f-b5e4-c1d0e8f7a2b9"
-version: "0.1.0.0"
+version: "0.1.1.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 owner: "gabeseltzer"
@@ -11,4 +11,7 @@ category: "General"
 artifacts:
   - "Jellyfin.Plugin.EpisodeContinuity.dll"
 changelog: |
-  Initial release.
+  - "Also treat gaps in episode numbers as missing episodes" is now a regular option on the settings page.
+  - Configurable cooldown between repeat warnings for the same session and episode (default 60 s).
+  - Settings page explains how the server warning and the web interstitial relate.
+  - Fixed invalid quoting in the plugin metadata.
