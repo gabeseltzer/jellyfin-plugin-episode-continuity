@@ -42,11 +42,17 @@ warning in the web client.
 
 ### What counts as missing
 
-By default "missing" means an episode the metadata provider (TVDB, TMDb, ...) knows about that
-Jellyfin holds as a virtual item, so shows need a metadata match. The option **Also treat gaps in
-episode numbers as missing episodes** additionally counts a jump in the episode numbers on disk
-within a season (S01E01 followed by S01E03) as a gap, which works for shows with no metadata but
-misfires on shows that are numbered irregularly on purpose.
+By default "missing" means a **virtual episode**: an item Jellyfin holds for an episode that has
+no file. On a default Jellyfin install these never exist. Core Jellyfin stopped creating them in
+10.7, and today the only thing that does is the TVDB plugin's **Missing Episode Fetcher**, a
+metadata fetcher that is separate from TheTVDB itself. TMDb cannot create virtual episodes at
+all, and a metadata match on its own is not enough. See [Requirements](#requirements) below.
+
+The option **Also treat gaps in episode numbers as missing episodes** does not need virtual
+episodes. It counts a jump in the episode numbers on disk within a season (S01E01 followed by
+S01E03) as a gap. Its limits: it only sees holes *between* two episodes you have in the same
+season, so it cannot notice a missing first or last episode of a season and never spans a season
+boundary, and it misfires on shows that are numbered irregularly on purpose.
 
 ## Settings
 
@@ -86,6 +92,26 @@ The script talks to the plugin's own endpoints:
 
 Requires Jellyfin 10.11.
 
+### Requirements
+
+The plugin can only warn about episodes Jellyfin knows are missing. Unless you use the
+numbering-gaps option, all four of these must hold or it will never fire:
+
+1. The [TVDB plugin](https://github.com/jellyfin/jellyfin-plugin-tvdb) is installed. Core
+   Jellyfin has not created virtual episodes since 10.7.
+2. In the TV library's settings, under **Metadata fetchers → Series**, **Missing Episode
+   Fetcher** is ticked. This is a different checkbox from **TheTVDB**; ticking TheTVDB alone
+   does nothing.
+3. The series has a TVDB id. The fetcher checks for that id specifically, so a match from
+   another provider does not count.
+4. A metadata refresh of the library has run since the above were set up.
+
+If you would rather not run the TVDB plugin, enable **Also treat gaps in episode numbers as
+missing episodes** in the plugin settings instead. It is the only mode that works on a default
+install, with the limits described under [What counts as missing](#what-counts-as-missing).
+
+### Steps
+
 1. Dashboard → Plugins → Repositories → **+**, and add the repository manifest URL from the
    [releases page](../../releases).
 2. Dashboard → Plugins → Catalog, install **Episode Continuity**, restart Jellyfin.
@@ -93,6 +119,21 @@ Requires Jellyfin 10.11.
 
 To install by hand instead, unzip the release into a new folder under Jellyfin's `plugins`
 directory and restart.
+
+## Troubleshooting
+
+The failure mode is silent: with nothing to detect, the plugin logs nothing and shows nothing.
+Check whether Jellyfin has any virtual episodes at all, with an API key or a logged-in token:
+
+```
+GET /Items?includeItemTypes=Episode&isMissing=true&recursive=true&limit=1
+```
+
+If `TotalRecordCount` is 0, none of the [Requirements](#requirements) are satisfied and no gap
+can ever be detected, regardless of plugin settings. Fix the library setup or turn on the
+numbering-gaps option. Once episodes are reported, check a specific one with
+`GET /EpisodeContinuity/Items/{itemId}/Continuity`, which returns `hasGapBefore` and the list of
+missing episodes.
 
 ## Development
 

@@ -2,9 +2,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Jellyfin.Data.Enums;
 using Jellyfin.Plugin.EpisodeContinuity.Configuration;
 using Jellyfin.Plugin.EpisodeContinuity.Continuity;
 using Jellyfin.Plugin.EpisodeContinuity.Web;
+using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
@@ -21,6 +23,7 @@ namespace Jellyfin.Plugin.EpisodeContinuity.Playback;
 public sealed class PlaybackWarningService : IHostedService
 {
     private readonly ISessionManager _sessionManager;
+    private readonly ILibraryManager _libraryManager;
     private readonly ContinuityService _continuity;
     private readonly WebClientRegistry _webClients;
     private readonly FileTransformationBridge _fileTransformation;
@@ -31,18 +34,21 @@ public sealed class PlaybackWarningService : IHostedService
     /// Initializes a new instance of the <see cref="PlaybackWarningService"/> class.
     /// </summary>
     /// <param name="sessionManager">The session manager.</param>
+    /// <param name="libraryManager">The library manager, used for the startup diagnostic.</param>
     /// <param name="continuity">The continuity service.</param>
     /// <param name="webClients">The registry of devices running the web script.</param>
     /// <param name="fileTransformation">The File Transformation bridge.</param>
     /// <param name="logger">The logger.</param>
     public PlaybackWarningService(
         ISessionManager sessionManager,
+        ILibraryManager libraryManager,
         ContinuityService continuity,
         WebClientRegistry webClients,
         FileTransformationBridge fileTransformation,
         ILogger<PlaybackWarningService> logger)
     {
         _sessionManager = sessionManager;
+        _libraryManager = libraryManager;
         _continuity = continuity;
         _webClients = webClients;
         _fileTransformation = fileTransformation;
@@ -55,7 +61,43 @@ public sealed class PlaybackWarningService : IHostedService
         _sessionManager.PlaybackStart += OnPlaybackStart;
         _fileTransformation.TryRegister();
         _logger.LogInformation("Episode Continuity playback warnings active");
+        _ = Task.Run(WarnIfNothingCanBeDetected, CancellationToken.None);
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Logs a warning when the library has no virtual episodes and the numbering-gap fallback is off,
+    /// because in that state no gap can ever be detected and the plugin fails silently.
+    /// </summary>
+    private void WarnIfNothingCanBeDetected()
+    {
+        try
+        {
+            var config = Plugin.CurrentConfiguration;
+            if (!config.Enabled || config.TreatNumberingGapsAsMissing)
+            {
+                return;
+            }
+
+            var virtualEpisodes = _libraryManager.GetCount(new InternalItemsQuery
+            {
+                IncludeItemTypes = [BaseItemKind.Episode],
+                IsVirtualItem = true,
+                Recursive = true,
+            });
+
+            if (virtualEpisodes == 0)
+            {
+                _logger.LogWarning(
+                    "Episode Continuity found no virtual (missing) episodes in the library and the numbering-gaps option is off, "
+                    + "so continuity warnings will never fire. Jellyfin only creates virtual episodes through the TVDB plugin's "
+                    + "\"Missing Episode Fetcher\"; see the Requirements section of the plugin README");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Episode Continuity could not run its startup library check");
+        }
     }
 
     /// <inheritdoc />
