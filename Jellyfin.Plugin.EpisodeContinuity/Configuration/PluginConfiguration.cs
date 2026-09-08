@@ -73,8 +73,8 @@ public class PluginConfiguration : BasePluginConfiguration
 
     /// <summary>
     /// Gets or sets a value indicating whether non-contiguous episode numbers on disk count as missing
-    /// episodes in addition to provider-known virtual episodes. Hidden from the config page; intended for
-    /// development against libraries with no metadata match.
+    /// episodes in addition to provider-known virtual episodes. Off by default because some shows are
+    /// numbered irregularly on purpose; useful for libraries without a metadata match.
     /// </summary>
     public bool TreatNumberingGapsAsMissing { get; set; }
 }

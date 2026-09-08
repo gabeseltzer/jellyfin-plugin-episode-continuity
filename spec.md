@@ -29,7 +29,7 @@ Research and the full list of candidate surfaces live in `docs/research.md`. The
 | v1 surfaces | (1) Web up-next dialog warning, (2) web pre-play interstitial with countdown, (3) server-push warning on playback start for all clients. |
 | Not in v1 | Metadata tagging, stop-autoplay-at-gap, detail-page badge, gaps report page, placeholder episodes. |
 | What counts as "missing" | **Provider virtual episodes only**: an episode the metadata provider (TVDB/TMDB) knows about that Jellyfin holds as a virtual/missing item. Numbering gaps on disk are *not* used by default. |
-| Dev switch | Hidden config flag `TreatNumberingGapsAsMissing` (default off, not on the config page) additionally treats non-contiguous episode numbers within a season as missing, so the synthetic devcontainer library can exercise the feature end to end. |
+| Numbering gaps | Config option `TreatNumberingGapsAsMissing` (default off; on the config page since 2026-09-08, originally a hidden dev switch) additionally treats non-contiguous episode numbers within a season as missing. Lets unmatched libraries, including the synthetic devcontainer one, exercise the feature. |
 | Server-push default | Toast only (non-blocking, playback continues). Pause+modal and modal-only are selectable. |
 | Web injection | Our own request-time `index.html` middleware by default; when the File Transformation plugin is present we register with it instead so only one component rewrites the page. |
 
@@ -88,8 +88,8 @@ Research and the full list of candidate surfaces live in `docs/research.md`. The
 ### R5. Configuration
 
 Config page: Enabled; server-push mode; toast duration; auto-resume seconds; warning cooldown seconds; web features
-enabled; up-next warning enabled; interstitial enabled; interstitial countdown seconds. Hidden:
-`TreatNumberingGapsAsMissing`.
+enabled; up-next warning enabled; interstitial enabled; interstitial countdown seconds; treat
+numbering gaps as missing.
 
 ### R6. Web injection
 

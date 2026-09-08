@@ -42,10 +42,11 @@ warning in the web client.
 
 ### What counts as missing
 
-"Missing" means an episode the metadata provider (TVDB, TMDb, ...) knows about that Jellyfin holds
-as a virtual item, so shows need a metadata match. A hidden setting,
-`TreatNumberingGapsAsMissing`, additionally treats non-contiguous episode numbers on disk as
-missing; it is meant for development against unmatched libraries.
+By default "missing" means an episode the metadata provider (TVDB, TMDb, ...) knows about that
+Jellyfin holds as a virtual item, so shows need a metadata match. The option **Also treat gaps in
+episode numbers as missing episodes** additionally counts a jump in the episode numbers on disk
+within a season (S01E01 followed by S01E03) as a gap, which works for shows with no metadata but
+misfires on shows that are numbered irregularly on purpose.
 
 ## Settings
 
@@ -56,6 +57,7 @@ Dashboard → Plugins → Episode Continuity.
 | Setting | Default | Meaning |
 | --- | --- | --- |
 | Enabled | on | Master switch. |
+| Also treat gaps in episode numbers as missing | off | Count numbering jumps on disk as gaps, not only provider-known virtual episodes. |
 | Server warning style | Toast | Off, toast, dialog, or pause + dialog + resume. |
 | Toast duration | 8000 ms | How long the toast stays up. |
 | Resume after | 10 s | Delay before unpausing in pause mode. |
