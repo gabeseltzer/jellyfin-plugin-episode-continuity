@@ -9,6 +9,14 @@
     "imageUrl": "",
     "versions": [
       {
+        "version": "0.1.1.0",
+        "changelog": "- \"Also treat gaps in episode numbers as missing episodes\" is now a regular option on the settings page.\n- Configurable cooldown between repeat warnings for the same session and episode (default 60 s).\n- Settings page explains how the server warning and the web interstitial relate.\n- Fixed invalid quoting in the plugin metadata.",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/gabeseltzer/jellyfin-plugin-episode-continuity/releases/download/v0.1.1/episodecontinuity_0.1.1.0.zip",
+        "checksum": "24c9ecc9e898d7c9111cdbaf0cf0c7c6",
+        "timestamp": "2026-09-08T04:46:26Z"
+      },
+      {
         "version": "0.1.0.0",
         "changelog": "Initial release.",
         "targetAbi": "10.11.0.0",
