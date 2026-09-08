@@ -63,8 +63,11 @@ Research and the full list of candidate surfaces live in `docs/research.md`. The
   straight to Episode 3."*
 - Modes: `Off`, `Toast` (default, `TimeoutMs` set), `Modal` (no timeout), `PauseAndModal`
   (Pause, modal, Unpause after N seconds).
-- Suppressed for a session that has the web script active (the script announces itself), and
-  not repeated for the same session and item within a short window.
+- Suppressed for a session that has the web script active (the script announces itself) *and*
+  the interstitial enabled, since the interstitial replaces it there. When the interstitial is
+  off, browsers get the server warning like any other client.
+- Not repeated for the same session and item within a configurable cooldown (default 60 s;
+  0 warns on every start).
 
 ### R3. Web up-next dialog warning
 
@@ -84,7 +87,7 @@ Research and the full list of candidate surfaces live in `docs/research.md`. The
 
 ### R5. Configuration
 
-Config page: Enabled; server-push mode; toast duration; auto-resume seconds; web features
+Config page: Enabled; server-push mode; toast duration; auto-resume seconds; warning cooldown seconds; web features
 enabled; up-next warning enabled; interstitial enabled; interstitial countdown seconds. Hidden:
 `TreatNumberingGapsAsMissing`.
 

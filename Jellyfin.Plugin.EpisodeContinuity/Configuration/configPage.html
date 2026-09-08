@@ -26,16 +26,17 @@
             <div class="fieldDescription checkboxFieldDescription">Turn the plugin off without uninstalling it.</div>
           </div>
 
-          <h3 class="sectionTitle">All clients</h3>
+          <h3 class="sectionTitle">Server warning (all clients)</h3>
+          <div class="fieldDescription" style="margin-bottom:1em">When an episode starts that skips over missing episodes, the plugin can warn the viewer in two ways. The <strong>server warning</strong> below is pushed to whatever client started playback and works everywhere, best effort. The <strong>web interstitial</strong> in the next section is drawn by a script inside the Jellyfin web app and is more reliable there. A browser only ever sees one of the two: while the interstitial is enabled, it replaces the server warning in the web client.</div>
 
           <div class="selectContainer">
-            <select is="emby-select" id="ServerPushMode" name="ServerPushMode" label="Warning on playback start">
+            <select is="emby-select" id="ServerPushMode" name="ServerPushMode" label="Server warning style">
               <option value="Off">Off</option>
               <option value="Toast">Toast (non-blocking)</option>
               <option value="Modal">Dialog with OK button</option>
               <option value="PauseAndModal">Pause, dialog, then resume</option>
             </select>
-            <div class="fieldDescription">Sent by the server to the client that started playback. Works on the web client and other clients that support display messages. <strong>Not shown in the web client while the interstitial below is enabled</strong>, since the interstitial replaces it there; turn the interstitial off to see this in a browser.</div>
+            <div class="fieldDescription">Sent by the server after playback has already started, so the first seconds of the episode may play before the warning appears. Works on any client that supports display messages; some clients (for example Android TV) ignore them. <strong>Not shown in the web client while the web interstitial is enabled.</strong></div>
           </div>
 
           <div class="inputContainer">
@@ -46,7 +47,12 @@
             <input is="emby-input" id="AutoResumeSeconds" name="AutoResumeSeconds" type="number" min="1" step="1" label="Resume after (seconds), pause mode only" />
           </div>
 
-          <h3 class="sectionTitle">Web client</h3>
+          <div class="inputContainer">
+            <input is="emby-input" id="WarningCooldownSeconds" name="WarningCooldownSeconds" type="number" min="0" step="1" label="Cooldown between repeat warnings (seconds)" />
+            <div class="fieldDescription">After warning a session about an episode, stay quiet if the same session starts the same episode again within this many seconds. This absorbs duplicate start reports and seeks. Set to 0 to warn on every start.</div>
+          </div>
+
+          <h3 class="sectionTitle">Web client script</h3>
 
           <div class="checkboxContainer checkboxContainer-withDescription">
             <label class="emby-checkbox-label">
@@ -67,9 +73,9 @@
           <div class="checkboxContainer checkboxContainer-withDescription">
             <label class="emby-checkbox-label">
               <input id="InterstitialEnabled" name="InterstitialEnabled" type="checkbox" is="emby-checkbox" />
-              <span>Pause and warn before an episode that skips missing ones</span>
+              <span>Show the web interstitial before an episode that skips missing ones</span>
             </label>
-            <div class="fieldDescription checkboxFieldDescription">Playback pauses with a message, then continues after the countdown or when the viewer presses Continue.</div>
+            <div class="fieldDescription checkboxFieldDescription">The web-client version of the server warning above. The script holds the video before it starts and shows a dialog naming the missing episodes, with a countdown, a Continue button and a Go back button. While this is on, web sessions do not receive the server warning; other clients still do.</div>
           </div>
 
           <div class="inputContainer">
@@ -90,7 +96,7 @@
         var pluginId = '3f8a1c6e-9d2b-4a7f-b5e4-c1d0e8f7a2b9';
         var page = document.querySelector('#EpisodeContinuityConfigPage');
         var checkboxes = ['Enabled', 'WebFeaturesEnabled', 'UpNextWarningEnabled', 'InterstitialEnabled'];
-        var numbers = ['ToastDurationMs', 'AutoResumeSeconds', 'InterstitialCountdownSeconds'];
+        var numbers = ['ToastDurationMs', 'AutoResumeSeconds', 'WarningCooldownSeconds', 'InterstitialCountdownSeconds'];
 
         function load(config) {
           checkboxes.forEach(function (id) {

@@ -25,3 +25,13 @@ SERVER_ID=<from /System/Info/Public> E1=<S01E01 item id> E3=<S01E03 item id> npm
 ```
 
 Screenshots and the captured console log land in `scripts/e2e/out/`.
+
+## README screenshots
+
+`screenshots.js` takes the same environment variables and writes the images the README embeds
+to `docs/screenshots/`. It flips plugin settings through the API while it runs and restores them
+at the end.
+
+```bash
+SERVER_ID=... E1=... E3=... node screenshots.js
+```

@@ -6,7 +6,7 @@ targetAbi: "10.11.0.0"
 framework: "net9.0"
 owner: "gabeseltzer"
 overview: "Warns viewers when the next episode to play is not the next one in the series because episodes in between are missing from the library."
-description: "Detects gaps in a series (episodes the metadata provider knows about but that have no file) and warns at playback time: a warning inside the web client's "Next episode" countdown, a pause-and-confirm interstitial before an episode that skips missing ones, and a server-sent toast for other clients."
+description: "Detects gaps in a series (episodes the metadata provider knows about but that have no file) and warns at playback time: a warning inside the web client's 'Next episode' countdown, a pause-and-confirm interstitial before an episode that skips missing ones, and a server-sent toast for other clients."
 category: "General"
 artifacts:
   - "Jellyfin.Plugin.EpisodeContinuity.dll"

@@ -46,6 +46,12 @@ public class PluginConfiguration : BasePluginConfiguration
     public int AutoResumeSeconds { get; set; } = 10;
 
     /// <summary>
+    /// Gets or sets how many seconds to wait before warning the same session about the same episode again.
+    /// Absorbs duplicate playback-start reports and seeks; zero warns on every start.
+    /// </summary>
+    public int WarningCooldownSeconds { get; set; } = 60;
+
+    /// <summary>
     /// Gets or sets a value indicating whether the web client script is injected at all.
     /// </summary>
     public bool WebFeaturesEnabled { get; set; } = true;

@@ -20,8 +20,6 @@ namespace Jellyfin.Plugin.EpisodeContinuity.Playback;
 /// </summary>
 public sealed class PlaybackWarningService : IHostedService
 {
-    private static readonly TimeSpan RepeatSuppression = TimeSpan.FromMinutes(10);
-
     private readonly ISessionManager _sessionManager;
     private readonly ContinuityService _continuity;
     private readonly WebClientRegistry _webClients;
@@ -110,7 +108,8 @@ public sealed class PlaybackWarningService : IHostedService
 
             var key = $"{session.Id}:{e.Item.Id:N}";
             var now = DateTime.UtcNow;
-            if (_recentlyWarned.TryGetValue(key, out var last) && now - last < RepeatSuppression)
+            var cooldown = TimeSpan.FromSeconds(Math.Max(0, config.WarningCooldownSeconds));
+            if (_recentlyWarned.TryGetValue(key, out var last) && now - last < cooldown)
             {
                 return;
             }
@@ -122,7 +121,7 @@ public sealed class PlaybackWarningService : IHostedService
             }
 
             _recentlyWarned[key] = now;
-            PruneRecentlyWarned(now);
+            PruneRecentlyWarned(now, cooldown);
 
             var text = ContinuityMessages.SkipWarning(result);
             _logger.LogInformation("Warning session {Session} ({Client}): {Text}", session.Id, session.Client, text);
@@ -167,7 +166,7 @@ public sealed class PlaybackWarningService : IHostedService
         return _sessionManager.SendPlaystateCommand(sessionId, sessionId, new PlaystateRequest { Command = command }, CancellationToken.None);
     }
 
-    private void PruneRecentlyWarned(DateTime now)
+    private void PruneRecentlyWarned(DateTime now, TimeSpan cooldown)
     {
         if (_recentlyWarned.Count < 256)
         {
@@ -176,7 +175,7 @@ public sealed class PlaybackWarningService : IHostedService
 
         foreach (var pair in _recentlyWarned)
         {
-            if (now - pair.Value > RepeatSuppression)
+            if (now - pair.Value > cooldown)
             {
                 _recentlyWarned.TryRemove(pair.Key, out _);
             }
