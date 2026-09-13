@@ -9,6 +9,14 @@
     "imageUrl": "",
     "versions": [
       {
+        "version": "0.2.0.0",
+        "changelog": "- Compatible with Jellyfin 12. The plugin now targets .NET 10 and Jellyfin.Controller 12.0.0.\n- Requires Jellyfin 12; it will not load on 10.11 or earlier. Stay on 0.1.2 for those servers.",
+        "targetAbi": "12.0.0.0",
+        "sourceUrl": "https://github.com/gabeseltzer/jellyfin-plugin-episode-continuity/releases/download/v0.2.0/episodecontinuity_0.2.0.0.zip",
+        "checksum": "a440f45566fbc65a6710ee5eec15e715",
+        "timestamp": "2026-09-13T14:38:52Z"
+      },
+      {
         "version": "0.1.2.0",
         "changelog": "- README documents that missing episodes come only from the TVDB plugin's \"Missing Episode Fetcher\", with a Requirements block and a Troubleshooting check.\n- Logs a startup warning when the library has no virtual episodes and the numbering-gaps option is off, since no gap can be detected in that state.\n- Describes the limits of the numbering-gaps fallback (same-season holes between two known episodes only).",
         "targetAbi": "10.11.0.0",
