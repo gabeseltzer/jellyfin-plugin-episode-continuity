@@ -13,6 +13,15 @@ if [ ! -w "$HOME/.nuget" ] || [ ! -w "$HOME/.nuget/packages" ]; then
   sudo chown -R "$(id -u):$(id -g)" "$HOME/.nuget"
 fi
 
+# The claude-code devcontainer feature installs Claude Code as root into the nvm global
+# node_modules, so the vscode user cannot write there and `claude update` fails with
+# "Insufficient permissions to install update". Hand the package tree to the dev user so
+# Claude Code can update itself.
+CLAUDE_PKG="$(npm root -g 2>/dev/null)/@anthropic-ai"
+if [ -d "$CLAUDE_PKG" ] && [ ! -w "$CLAUDE_PKG" ]; then
+  sudo chown -R "$(id -u):$(id -g)" "$CLAUDE_PKG"
+fi
+
 echo "dotnet SDKs:"
 dotnet --list-sdks
 
