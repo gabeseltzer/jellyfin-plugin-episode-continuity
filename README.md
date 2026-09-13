@@ -94,6 +94,22 @@ Requires Jellyfin 12, which runs on .NET 10. Version 0.2.0 and later will not lo
 Jellyfin 10.11 or earlier; stay on 0.1.2 for those servers. The plugin repository manifest
 keeps both, so Jellyfin offers whichever matches your server.
 
+### Upgrading a 10.11 server to Jellyfin 12
+
+Nothing to do before the server upgrade. A 10.11 server filters the repository manifest by
+target ABI, so it will not offer 0.2.0 and your installed 0.1.2 keeps working.
+
+Afterwards the plugin needs updating too, in this order:
+
+1. Upgrade Jellyfin to 12. On first boot 0.1.2 fails to load, because it is built for .NET 9 and
+   the 10.11 ABI. The plugin is simply inactive; nothing else is affected.
+2. Dashboard → Plugins → Catalog, update **Episode Continuity** to 0.2.0.
+3. Restart Jellyfin, then hard-refresh any open browser tab.
+
+The gap between steps 1 and 2 is unavoidable: the catalog lives on the server, so the plugin
+cannot be updated until the upgraded server is running. Your settings survive it — they live in
+Jellyfin's plugin configuration, not in the DLL.
+
 ### Requirements
 
 The plugin can only warn about episodes Jellyfin knows are missing. Unless you use the

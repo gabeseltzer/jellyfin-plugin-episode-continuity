@@ -59,7 +59,11 @@ public sealed class FileTransformationBridge
             var parse = payloadType.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, [typeof(string)]);
             if (parse is null)
             {
-                _logger.LogWarning("File Transformation payload type {Type} has no Parse(string); using built-in middleware", payloadType.FullName);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                {
+                    _logger.LogWarning("File Transformation payload type {Type} has no Parse(string); using built-in middleware", payloadType.FullName);
+                }
+
                 return false;
             }
 
