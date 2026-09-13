@@ -1,7 +1,7 @@
 # Disk sharing with the sibling jellyfin-data-flow-plugin devcontainer:
 #   - Dockerfile is byte-identical, so the base image and apt layer come from Docker's build cache.
 #   - devcontainer-lock.json pins the same feature versions, so the feature layers are cached too.
-#   - jellyfin/jellyfin:10.11 is the same image tag.
+#   - jellyfin/jellyfin:12 is the same image tag.
 #   - NuGet packages live in one named volume (jellyfin-plugin-nuget) shared by both repos.
 # Only this repo's Jellyfin config/cache and the workspace itself are separate.
 services:
@@ -30,7 +30,7 @@ services:
       JELLYFIN_CONTAINER: jellyfin-episodecontinuity-dev
 
   jellyfin:
-    image: jellyfin/jellyfin:10.11
+    image: jellyfin/jellyfin:12
     container_name: jellyfin-episodecontinuity-dev
     # Host port 8097 so this can run alongside the data-flow dev Jellyfin on 8096.
     ports:

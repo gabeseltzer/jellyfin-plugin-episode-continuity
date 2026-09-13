@@ -166,7 +166,10 @@ public sealed class PlaybackWarningService : IHostedService
             PruneRecentlyWarned(now, cooldown);
 
             var text = ContinuityMessages.SkipWarning(result);
-            _logger.LogInformation("Warning session {Session} ({Client}): {Text}", session.Id, session.Client, text);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("Warning session {Session} ({Client}): {Text}", session.Id, session.Client, text);
+            }
 
             switch (config.ServerPushMode)
             {

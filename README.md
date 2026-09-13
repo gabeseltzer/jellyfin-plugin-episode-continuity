@@ -90,7 +90,9 @@ The script talks to the plugin's own endpoints:
 
 ## Installation
 
-Requires Jellyfin 10.11.
+Requires Jellyfin 12, which runs on .NET 10. Version 0.2.0 and later will not load on
+Jellyfin 10.11 or earlier; stay on 0.1.2 for those servers. The plugin repository manifest
+keeps both, so Jellyfin offers whichever matches your server.
 
 ### Requirements
 
@@ -137,7 +139,7 @@ missing episodes.
 
 ## Development
 
-Open in VS Code and reopen in the devcontainer. It starts a Jellyfin 10.11 server on
+Open in VS Code and reopen in the devcontainer. It starts a Jellyfin 12 server on
 http://localhost:8097 with `media/` mounted as `/media` and `dist/plugins` as the plugin directory.
 
 - `scripts/deploy.sh` builds the plugin, copies it into Jellyfin, and restarts the server.

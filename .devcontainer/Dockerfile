@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/dotnet:1-9.0-bookworm
+FROM mcr.microsoft.com/devcontainers/dotnet:1-10.0-noble
 
 # ffmpeg: generate synthetic test media. jq/curl: poke the Jellyfin API from scripts.
 # The base image carries a Yarn apt repo whose signing key has expired; we don't need it.

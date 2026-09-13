@@ -19,8 +19,8 @@ dotnet build "$PROJECT/$PROJECT.csproj" -c "$CONFIG" --nologo -v quiet
 echo "Copying to $DEST"
 rm -rf dist/plugins/"${SHORT}"_*
 mkdir -p "$DEST"
-cp "$PROJECT/bin/$CONFIG/net9.0/$PROJECT.dll" "$DEST/"
-[ -f "$PROJECT/bin/$CONFIG/net9.0/$PROJECT.pdb" ] && cp "$PROJECT/bin/$CONFIG/net9.0/$PROJECT.pdb" "$DEST/"
+cp "$PROJECT/bin/$CONFIG/net10.0/$PROJECT.dll" "$DEST/"
+[ -f "$PROJECT/bin/$CONFIG/net10.0/$PROJECT.pdb" ] && cp "$PROJECT/bin/$CONFIG/net10.0/$PROJECT.pdb" "$DEST/"
 [ -f meta.json ] && sed "s/__VERSION__/$VERSION/g" meta.json > "$DEST/meta.json"
 
 echo "Restarting $CONTAINER..."
