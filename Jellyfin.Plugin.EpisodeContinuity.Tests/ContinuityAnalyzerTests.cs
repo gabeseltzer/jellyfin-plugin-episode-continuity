@@ -161,6 +161,48 @@ public class ContinuityAnalyzerTests
     }
 
     [Fact]
+    public void AlternateVersionNotInList_UsesItsEpisodePosition()
+    {
+        var e1 = EpisodeFactory.Real(1, 1);
+        var v2 = EpisodeFactory.Virtual(1, 2);
+        var primary = EpisodeFactory.Real(1, 3, "Primary 1080p");
+        var alternate = EpisodeFactory.Real(1, 3, "Alternate 720p");
+
+        var result = ContinuityAnalyzer.Analyze([e1, v2, primary], alternate, false, Today);
+
+        Assert.Equal(primary.Id, result.Item?.Id);
+        Assert.Equal("S01E02", Assert.Single(result.MissingBefore).Code);
+        Assert.Equal(e1.Id, result.PreviousAvailable?.Id);
+    }
+
+    [Fact]
+    public void AlternateVersionLosingTheTie_IsStillFound()
+    {
+        var e1 = EpisodeFactory.Real(1, 1);
+        var v2 = EpisodeFactory.Virtual(1, 2);
+        var primary = EpisodeFactory.Real(1, 3);
+        var alternate = EpisodeFactory.Real(1, 3);
+
+        var byId = ContinuityAnalyzer.Analyze([e1, v2, primary, alternate], alternate.Id, false, Today);
+        var byItem = ContinuityAnalyzer.Analyze([e1, v2, primary, alternate], alternate, false, Today);
+
+        Assert.Same(ContinuityResult.Empty, byId);
+        Assert.True(byItem.HasGapBefore);
+    }
+
+    [Fact]
+    public void UnknownVirtualItem_DoesNotBorrowAPosition()
+    {
+        var e1 = EpisodeFactory.Real(1, 1);
+        var e2 = EpisodeFactory.Real(1, 2);
+        var strayVirtual = EpisodeFactory.Virtual(1, 2);
+
+        var result = ContinuityAnalyzer.Analyze([e1, e2], strayVirtual, false, Today);
+
+        Assert.Same(ContinuityResult.Empty, result);
+    }
+
+    [Fact]
     public void LongRun_ListsEveryMissingEpisodeInOrder()
     {
         var e1 = EpisodeFactory.Real(1, 1);

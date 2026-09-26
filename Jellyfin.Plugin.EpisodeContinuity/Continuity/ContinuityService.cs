@@ -72,6 +72,6 @@ public sealed class ContinuityService
         }
 
         var episodes = _episodeSource.GetSeriesEpisodes(seriesId);
-        return ContinuityAnalyzer.Analyze(episodes, episode.Id, _configuration().TreatNumberingGapsAsMissing);
+        return ContinuityAnalyzer.Analyze(episodes, episode, _configuration().TreatNumberingGapsAsMissing);
     }
 }

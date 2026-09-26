@@ -26,8 +26,44 @@ public static class ContinuityAnalyzer
     {
         var today = (now ?? DateTime.UtcNow).Date;
         var timeline = BuildTimeline(seriesEpisodes, treatNumberingGapsAsMissing, today);
+        return AnalyzeAt(timeline, timeline.FindIndex(e => e.Id == itemId));
+    }
 
-        var index = timeline.FindIndex(e => e.Id == itemId);
+    /// <summary>
+    /// Analyses the continuity around one episode item, which may be an alternate version of the
+    /// episode the series list holds (Jellyfin groups "S01E03 - 720p" and "S01E03 - 1080p" as versions
+    /// of one episode, and some clients report the non-primary version's id when they play it).
+    /// </summary>
+    /// <param name="seriesEpisodes">Every episode item of the series, virtual ones included.</param>
+    /// <param name="item">The episode to analyse.</param>
+    /// <param name="treatNumberingGapsAsMissing">Also treat non-contiguous numbers within a season as missing.</param>
+    /// <param name="now">The reference time for deciding whether a virtual episode has aired.</param>
+    /// <returns>The continuity result, or <see cref="ContinuityResult.Empty"/> when the item has no place in the list.</returns>
+    public static ContinuityResult Analyze(
+        IReadOnlyList<Episode> seriesEpisodes,
+        Episode item,
+        bool treatNumberingGapsAsMissing,
+        DateTime? now = null)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+
+        var today = (now ?? DateTime.UtcNow).Date;
+        var timeline = BuildTimeline(seriesEpisodes, treatNumberingGapsAsMissing, today);
+
+        var index = timeline.FindIndex(e => e.Id == item.Id);
+        if (index < 0 && IsAvailable(item) && item.ParentIndexNumber is > 0 && item.IndexNumber is not null)
+        {
+            // Not in the list under its own id: an alternate version, or one that lost the per-position tie.
+            var season = item.ParentIndexNumber.Value;
+            var number = item.IndexNumber.Value;
+            index = timeline.FindIndex(e => e.IsAvailable && e.SeasonNumber == season && e.EpisodeNumber == number);
+        }
+
+        return AnalyzeAt(timeline, index);
+    }
+
+    private static ContinuityResult AnalyzeAt(List<EpisodeRef> timeline, int index)
+    {
         if (index < 0)
         {
             return ContinuityResult.Empty;
