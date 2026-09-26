@@ -90,8 +90,9 @@ public sealed class PlaybackWarningService : IHostedService
             {
                 _logger.LogWarning(
                     "Episode Continuity found no virtual (missing) episodes in the library and the numbering-gaps option is off, "
-                    + "so continuity warnings will never fire. Jellyfin only creates virtual episodes through the TVDB plugin's "
-                    + "\"Missing Episode Fetcher\"; see the Requirements section of the plugin README");
+                    + "so continuity warnings will never fire. Turn on \"Import missing episodes\" for your TV libraries in the "
+                    + "TMDb plugin settings and run the \"Refresh upcoming and missing episodes (TheMovieDb)\" scheduled task; "
+                    + "see the Requirements section of the plugin README");
             }
         }
         catch (Exception ex)

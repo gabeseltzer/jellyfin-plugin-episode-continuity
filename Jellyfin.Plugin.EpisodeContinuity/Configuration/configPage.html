@@ -17,6 +17,12 @@
             episode because episodes in between are missing from the library. "Missing" means an
             episode the metadata provider knows about that has no file (Jellyfin's virtual episodes).
           </p>
+          <p class="fieldDescription">
+            Jellyfin only creates virtual episodes when asked to. The simplest way is in the
+            <strong>TMDb</strong> plugin's settings: tick <strong>Import missing episodes</strong> and your TV
+            libraries, then run the scheduled task <strong>Refresh upcoming and missing episodes (TheMovieDb)</strong>
+            once. Without that, only the numbering-gaps option below can detect anything.
+          </p>
 
           <div class="checkboxContainer checkboxContainer-withDescription">
             <label class="emby-checkbox-label">

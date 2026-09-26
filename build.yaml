@@ -12,3 +12,4 @@ artifacts:
   - "Jellyfin.Plugin.EpisodeContinuity.dll"
 changelog: |
   - Warns when a client reports playback against an alternate version of an episode (for example "S01E03 - 720p"), which Jellyfin 12 stores separately from the main version.
+  - Works without the TVDB plugin on Jellyfin 12: the README, settings page and startup warning now point to the built-in TMDb plugin's "Import missing episodes" setting, which creates the missing-episode entries the plugin needs.
